@@ -21,7 +21,7 @@ Run the data extraction script:
 
 Make sure the required Python packages are installed in your environment:
 
-    pip3 install pip install produce psutil pyyaml word2number
+    pip3 install networkx produce psutil pyyaml word2number
     pip3 install git+https://github.com/clab/dynet#egg=dynet
 
 Clone/download required external software packages:
