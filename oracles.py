@@ -6,6 +6,7 @@
 
 import argparse
 import clf
+import copy
 import json
 import prep
 import sys
@@ -34,19 +35,21 @@ if __name__ == '__main__':
     results = []
     # Make oracles
     for i, (sentence, fragments) in enumerate(examples):
+        example = {}
+        example['sentence'] = sentence
         fragments = prep.realign_pronouns(sentence, fragments, args.lang)
         masked = [prep.mask_fragment(f) for f in fragments]
         fragments, symbols = zip(*masked)
+        example['symbols'] = symbols
         strings.update(a for f in fragments for c in f for a in c)
         binding_targets = transit.make_binding_targets(fragments)
+        example['binding_targets'] = copy.deepcopy(binding_targets)
+        example['cycle'] = transit.find_cycle(binding_targets)
         fragments = [prep.unbind(f) for f in fragments]
         oracle = transit.make_oracle(fragments, binding_targets)
+        example['oracle'] = oracle
         for action in oracle:
             actions.add(action)
-        example = {}
-        example['sentence'] = sentence
-        example['symbols'] = symbols
-        example['oracle'] = oracle
         if lemmass:
             assert len(lemmass[i]) == len(sentence)
             example['lemmas'] = lemmass[i]

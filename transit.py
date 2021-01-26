@@ -5,6 +5,8 @@
 import clf
 import collections
 import itertools
+import networkx as nx
+import networkx.algorithms.cycles as cycles
 import prep
 import sys
 import util
@@ -71,6 +73,18 @@ def force_decode(gold_actions, sentence):
 
 
 ### ORACLE TIME ###############################################################
+
+
+def find_cycle(binding_targets: List[List[List[Binding]]]) -> List[int]:
+    G = nx.Graph()
+    for i, bindingss in enumerate(binding_targets):
+        for j, bindings in enumerate(bindingss, start=i + 1):
+            if bindings:
+                G.add_edge(i, j)
+    try:
+        return cycles.find_cycle(G)
+    except nx.NetworkXNoCycle:
+        return []
 
 
 def make_binding_targets(fragments: List[Sequence[clf.Clause]]) -> List[List[List[Binding]]]:

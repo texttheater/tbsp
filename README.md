@@ -28,7 +28,7 @@ Run the data extraction script:
 
 Make sure the required Python packages are installed in your environment:
 
-    pip3 install produce psutil pyyaml word2number Cython cmake torch h5py overrides nltk
+    pip3 install produce psutil pyyaml word2number Cython cmake torch h5py overrides nltk networkx
     pip3 install git+https://github.com/clab/dynet#egg=dynet
 
 Clone/download required external software packages:
@@ -50,8 +50,8 @@ Download ElMo models for English, German, Italian, and Dutch from
     unzip -d models/ElMoForManyLangs/en 144.zip
     unzip -d models/ElMoForManyLangs/it 159.zip
     unzip -d models/ElMoForManyLangs/nl 164.zip
-    sed -ie 's~/Users/yijialiu/work/projects/conll2018/models/word_elmo/~../../../ext/ElMoForManyLangs/configs/~' models/ElMoForManyLangs/en/config.json
-    sed -ie 's~/users4/conll18st/elmo/configs/~../../../ext/ElMoForManyLangs/configs/~' models/ElMoForManyLangs/{de,it,nl}/config.json
+    sed -i 's~/Users/yijialiu/work/projects/conll2018/models/word_elmo/~../../../ext/ElMoForManyLangs/configs/~' models/ElMoForManyLangs/en/config.json
+    sed -i 's~/users4/conll18st/elmo/configs/~../../../ext/ElMoForManyLangs/configs/~' models/ElMoForManyLangs/{de,it,nl}/config.json
     rm {142,144,159,164}.zip
 
 Download [UDPipe models](http://ufal.mff.cuni.cz/udpipe/models) for lemmatization:

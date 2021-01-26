@@ -20,19 +20,19 @@ def embed_sentence(sentence, lang='en'):
     global elmo_en, elmo_de, elmo_it, elmo_nl
     if lang == 'en':
         if not elmo_en:
-            elmo_en = Embedder('models/ElMoForManyLangs/en')
+            elmo_en = Embedder('out/models/ElMoForManyLangs/en')
         return elmo_en.sents2elmo((sentence,))[0]
     elif lang == 'de':
         if not elmo_de:
-            elmo_de = Embedder('models/ElMoForManyLangs/de')
+            elmo_de = Embedder('out/models/ElMoForManyLangs/de')
         return elmo_de.sents2elmo((sentence,))[0]
     elif lang == 'it':
         if not elmo_de:
-            elmo_de = Embedder('models/ElMoForManyLangs/it')
+            elmo_de = Embedder('out/models/ElMoForManyLangs/it')
         return elmo_de.sents2elmo((sentence,))[0]
     elif lang == 'nl':
         if not elmo_de:
-            elmo_de = Embedder('models/ElMoForManyLangs/nl')
+            elmo_de = Embedder('out/models/ElMoForManyLangs/nl')
         return elmo_de.sents2elmo((sentence,))[0]
     else:
-        raise ValueError('language not supported: {}'.format(lang))
+        raise ValueError(f'language not supported: {lang}')
