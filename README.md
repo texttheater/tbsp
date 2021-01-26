@@ -6,6 +6,13 @@ Transition-based semantic parser for Discourse Representation Structures.
 Setup
 -----
 
+Make sure Git LFS is installed, then clone the repository and cd into the
+working copy:
+
+    git lfs init
+    git clone git@github.com:texttheater/tbsp.git
+    cd tbsp
+
 Download data from the [Parallel Meaning Bank](https://pmb.let.rug.nl):
 
     mkdir -p data
@@ -21,7 +28,7 @@ Run the data extraction script:
 
 Make sure the required Python packages are installed in your environment:
 
-    pip3 install pip install produce psutil pyyaml word2number
+    pip3 install produce psutil pyyaml word2number Cython cmake torch h5py overrides nltk
     pip3 install git+https://github.com/clab/dynet#egg=dynet
 
 Clone/download required external software packages:
@@ -29,7 +36,7 @@ Clone/download required external software packages:
     mkdir -p ext
     git clone --branch v.2.2.0 https://github.com/RikVN/DRS_parsing.git ext/DRS_parsing # for postprocessing and evaluation; note that newer versions are not supported yet
     git clone https://github.com/HIT-SCIR/ELMoForManyLangs.git ext/ElMoForManyLangs
-    git clone git@github.com:ParallelMeaningBank/elephant.git ext/elephant # for tokenization
+    git clone https://github.com/ParallelMeaningBank/elephant.git ext/elephant # for tokenization
     wget https://github.com/ufal/udpipe/releases/download/v1.2.0/udpipe-1.2.0-bin.zip # for lemmatization
     unzip -d ext udpipe-1.2.0-bin.zip
     rm udpipe-1.2.0-bin.zip
@@ -56,4 +63,11 @@ Download [UDPipe models](http://ufal.mff.cuni.cz/udpipe/models) for lemmatizatio
 Experiments
 -----------
 
-TBD
+Run experiments on the PMB 2.2.0 development data:
+
+    produce out/pmb-2.2.0.en.dev.gold.sg{0..20}g{1..20}.eval
+    produce out/pmb-2.2.0.{de,it,nl}.dev.gold,s{0..20}.eval
+
+Test the best-on-dev models on the test data:
+
+TBC
