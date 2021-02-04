@@ -329,6 +329,8 @@ class Parser:
     def apply_action(self, action_index, semtag_index, roleset_index,
         stack_state, stack_inputs, actions_state, buf_state, buf_inputs):
         action = self.actions[action_index]
+        a = dy.lookup(self.a, action_index)
+        actions_state = actions_state.add_input(a)
         if action[0] == 'confirm':
             stack_state = stack_state.prev()
             inp = stack_inputs.pop()
