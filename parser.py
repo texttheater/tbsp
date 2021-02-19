@@ -264,6 +264,8 @@ class Parser:
                 log_probs.append(log_prob)
                 action_index = gold_action_index
             action = self.actions[action_index]
+            a = dy.lookup(self.a, action_index)
+            actions_state = actions_state.add_input(a)
             if action[0] == 'confirm':
                 # choose semtag based on parser state
                 sdist, semtag_index = self.choose_semtag(p_t)
