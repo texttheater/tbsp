@@ -31,7 +31,8 @@ if __name__ == '__main__':
             oracle_unmasked.append(action)
         assert len(symbolss) == 0
         # Force decode (sanity check)
-        drs = transit.force_decode(oracle_unmasked, sentence)
+        fragments = transit.force_decode(oracle_unmasked, sentence)
+        clauses = [c for f in fragments for c in f]
         # Postprocess
         drs = list(clf.fragment_key(drs))
         drs = finish.realign_pronouns(drs)

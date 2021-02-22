@@ -66,7 +66,8 @@ if __name__ == '__main__':
         else:
             lemmas = None
         dy.renew_cg()
-        actions, drs = p.parse(sentence, lemmas=lemmas)
+        actions, fragments = p.parse(sentence, lemmas=lemmas)
+        drs = [c for f in framgents for c in f]
         drs = list(clf.fragment_key(drs))
         drs = finish.realign_pronouns(drs)
         finish.add_missing_refs_from_discourse_relations(drs)

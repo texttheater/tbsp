@@ -62,14 +62,14 @@ def force_decode(gold_actions, sentence):
     stack = []
     actions = []
     buf = [(i, None, False) for i in reversed(range(len(sentence)))]
-    clauses = []
+    fragments = []
     for action in gold_actions:
         if not is_action_allowed(action, stack, actions, buf):
             raise Exception('{} not allowed'.format(action))
-        apply_action(action, stack, actions, buf, clauses)
+        apply_action(action, stack, actions, buf, fragments)
     assert len(stack) == 0
     assert len(buf) == 0
-    return clauses
+    return fragments
 
 
 ### ORACLE TIME ###############################################################
@@ -205,11 +205,11 @@ def is_action_allowed(action, stack, actions, buf):
     raise Exception('unknown action type: ' + action[0])
 
 
-def apply_action(action, stack, actions, buf, clauses):
+def apply_action(action, stack, actions, buf, fragments):
     if action[0] == 'confirm':
         fragment = prep.unbind(action[1])
         stack[-1] = stack[-1][0], fragment, True
-        clauses.extend(fragment)
+        fragments.append(fragment)
     elif action[0] == 'reduce':
         stack.pop()
     elif action[0] == 'bind':

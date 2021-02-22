@@ -241,8 +241,8 @@ class Parser:
         stack_state = self.stack_lstm.initial_state()
         stack_state = stack_state.add_input(self.stack_guard)
         stack_inputs = [] # keep stack LSTM stack_inputs, needed for interpretation/composition function
-        # Initialize clauses:
-        clauses = []
+        # Initialize fragments:
+        fragments = []
         # Parse:
         while len(stack) > 1 or len(buf) > 1:
             # compute parser state
@@ -301,14 +301,14 @@ class Parser:
             else:
                 semtag_index = None
                 roleset_index = None
-            transit.apply_action(action, stack, actions, buf, clauses)
+            transit.apply_action(action, stack, actions, buf, fragments)
             stack_state, actions_state, buf_state = self.apply_action(
                 action_index, semtag_index, roleset_index, stack_state,
                 stack_inputs, actions_state, buf_state, buf_inputs)
         # Return:
         if gold_actions is not None:
             return -dy.esum(log_probs)
-        return actions, clauses
+        return actions, fragments
 
     def compose_lr(self, rel, left_inp, right_inp):
         rel_rep = dy.lookup(self.r1, rel)
