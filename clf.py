@@ -213,13 +213,13 @@ def unbind_clause(clause, bindings):
     return tuple(clause)
 
 
-def unbind(fragment: Tuple[clf.Clause]) -> Tuple[clf.Clause]:
+def unbind(fragment: Tuple[Clause]) -> Tuple[Clause]:
     """Replaces referents in a fragment by variables.
     """
     bindings = {}
     for clause in fragment:
-        for arg in clf.args(clause):
-            if clf.is_ref(arg) and not arg in bindings:
-                bindings[arg] = clf.Var(arg[0])
+        for arg in args(clause):
+            if is_ref(arg) and not arg in bindings:
+                bindings[arg] = Var(arg[0])
     fragment = tuple(unbind_clause(c, bindings) for c in fragment)
     return fragment

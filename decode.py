@@ -3,6 +3,7 @@
 
 import argparse
 import clf
+import fix
 import horizontal
 import hyper
 import json
