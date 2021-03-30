@@ -16,15 +16,16 @@ working copy:
 Download data from the [Parallel Meaning Bank](https://pmb.let.rug.nl):
 
     mkdir -p data
-    wget https://pmb.let.rug.nl/releases/pmb-2.2.0.zip
-    unzip -d data pmb-2.2.0.zip
-    rm pmb-2.2.0.zip
-
-Run the data extraction script:
-
-    cd data/pmb-2.2.0
-    bash src/extract.sh
-    cd ../..
+    cd data
+    wget https://pmb.let.rug.nl/releases/exp_data_2.2.0.zip
+    unzip exp_data_2.2.0.zip
+    rm exp_data_2.2.0.zip
+    mv exp_data_2.2.0 pmb-2.2.0
+    wget https://pmb.let.rug.nl/releases/exp_data_3.0.0.zip
+    unzip exp_data_3.3.0.zip
+    rm exp_data_3.3.0.zip
+    mv pmb_exp_data_3.0.0 pmb-3.0.0
+    cd ..
 
 Make sure the required Python packages are installed in your environment:
 
@@ -34,10 +35,11 @@ Make sure the required Python packages are installed in your environment:
 Clone/download required external software packages:
 
     mkdir -p ext
-    git clone --branch v.2.2.0 https://github.com/RikVN/DRS_parsing.git ext/DRS_parsing # for postprocessing and evaluation; note that newer versions are not supported yet
+    git clone --branch v.2.2.0 https://github.com/RikVN/DRS_parsing.git ext/DRS_parsing
+    git clone https://github.com/RikVN/DRS_parsing.git ext/DRS_parsing_3
     git clone https://github.com/HIT-SCIR/ELMoForManyLangs.git ext/ElMoForManyLangs
-    git clone https://github.com/ParallelMeaningBank/elephant.git ext/elephant # for tokenization
-    wget https://github.com/ufal/udpipe/releases/download/v1.2.0/udpipe-1.2.0-bin.zip # for lemmatization
+    git clone https://github.com/ParallelMeaningBank/elephant.git ext/elephant
+    wget https://github.com/ufal/udpipe/releases/download/v1.2.0/udpipe-1.2.0-bin.zip
     unzip -d ext udpipe-1.2.0-bin.zip
     rm udpipe-1.2.0-bin.zip
 
