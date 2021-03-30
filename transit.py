@@ -7,7 +7,6 @@ import collections
 import itertools
 import networkx as nx
 import networkx.algorithms.cycles as cycles
-import prep
 import sys
 import util
 
@@ -207,7 +206,7 @@ def is_action_allowed(action, stack, actions, buf):
 
 def apply_action(action, stack, actions, buf, fragments):
     if action[0] == 'confirm':
-        fragment = prep.unbind(action[1])
+        fragment = clf.unbind(action[1])
         stack[-1] = stack[-1][0], fragment, True
         fragments.append(fragment)
     elif action[0] == 'reduce':

@@ -4,7 +4,6 @@
 import argparse
 import clf
 import guess
-import prep
 import sys
 import util
 import vertical
@@ -23,7 +22,7 @@ if __name__ == '__main__':
     assert len(examples) == len(lemmass)
     for (sentence, fragments), lemmas in zip(examples, lemmass):
         assert len(sentence) == len(lemmas)
-        masked = [prep.mask_fragment(f) for f in fragments]
+        masked = [mask.mask_fragment(f) for f in fragments]
         fragments, _ = zip(*masked)
         fragments = list(fragments)
         for i in range(len(fragments)):

@@ -41,7 +41,7 @@ def read(flo: TextIO) -> List[Tuple[str, List[Sequence[Clause]]]]:
         assert block[1].startswith('%%% ')
         assert block[2].startswith('%%% ')
         assert block[-1].rstrip() == ''
-        sentence = tuple(t for t in block[2][4:].split(' ') if t != 'ø')
+        sentence = tuple(t for t in block[2].rstrip()[4:].split(' ') if t != 'ø')
         token_fragment_map = collections.defaultdict(list)
         for line in block[3:-1]:
             clause, tokens = SEP_PATTERN.split(line, 1)
@@ -72,7 +72,7 @@ def write(drss, flo):
 def is_ref(arg):
     if not isinstance(arg, str):
         return False
-    if arg[0] not in 'bepstx':
+    if arg[0] not in 'benpstx':
         return False
     try:
         int(arg[1:])
@@ -159,6 +159,18 @@ def args(clause):
     return itertools.chain((clause[0],), clause[2:])
 
 
+def fragments_key(fragments):
+    counter = collections.Counter()
+    var_str_map = {}
+    return tuple(
+        tuple(
+            clause_key(c, counter, var_str_map)
+            for c in f
+        )
+        for f in fragments
+    )
+
+
 def fragment_key(fragment):
     counter = collections.Counter()
     var_str_map = {}
@@ -190,3 +202,24 @@ def replace(old, new, obj):
     if isinstance(obj, list):
         return list(replace(old, new, e) for e in obj)
     return obj
+
+
+def unbind_clause(clause, bindings):
+    clause = list(clause)
+    clause[0] = bindings.get(clause[0], clause[0])
+    clause[2] = bindings.get(clause[2], clause[2])
+    if len(clause) > 3:
+        clause[3] = bindings.get(clause[3], clause[3])
+    return tuple(clause)
+
+
+def unbind(fragment: Tuple[clf.Clause]) -> Tuple[clf.Clause]:
+    """Replaces referents in a fragment by variables.
+    """
+    bindings = {}
+    for clause in fragment:
+        for arg in clf.args(clause):
+            if clf.is_ref(arg) and not arg in bindings:
+                bindings[arg] = clf.Var(arg[0])
+    fragment = tuple(unbind_clause(c, bindings) for c in fragment)
+    return fragment

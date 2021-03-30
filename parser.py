@@ -3,7 +3,6 @@ import elmo
 import guess
 import hyper
 import numpy as np
-import prep
 import quantities
 import rolesets
 import sys

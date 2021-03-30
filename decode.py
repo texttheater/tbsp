@@ -3,7 +3,6 @@
 
 import argparse
 import clf
-import finish
 import horizontal
 import hyper
 import json
@@ -28,6 +27,7 @@ if __name__ == '__main__':
     ap.add_argument('tok', help='tokenized input sentences in horizontal format')
     ap.add_argument('lemmas', nargs='?', help='input lemmas in vertical format')
     ap.add_argument('--roles', help='input roles in JSON format')
+    ap.add_argument('--mode', required=True, choices=(2, 3), help='PMB major version')
     args = ap.parse_args()
     # Read training examples
     sentences = []
@@ -64,6 +64,8 @@ if __name__ == '__main__':
     if args.roles:
         with open(args.roles) as f:
             roler = srl.Roler(json.reads(l) for l in f)
+    # Create checker
+    checker = drs.Checker(args.mode)
     # Parse:
     for i, sentence in enumerate(sentences):
         if lemmass:
@@ -75,12 +77,31 @@ if __name__ == '__main__':
         actions, fragments = p.parse(sentence, lemmas=lemmas)
         if args.roles:
             roler.overwrite_roles(fragments, sentence)
-        drs = [c for f in framgents for c in f]
-        drs = list(clf.fragment_key(drs))
-        drs = finish.realign_pronouns(drs)
-        finish.add_missing_refs_from_discourse_relations(drs)
-        finish.add_missing_refs_from_roles(drs)
-        finish.ensure_main_box(drs)
-        drs = finish.replace_empty_with_dummy_drs(drs)
+        # Postprocess
+        fragments = clf.fragments_key(fragments)
+        fragments = constants.replace_constants_rev(fragments)
+        fragments = constants.remove_constant_clauses(fragments)
+        # Fix
+        clauses = [c for f in fragments for c in f]
+        if args.mode == 2:
+            fix.add_missing_box_refs(clauses, checker)
+        fix.add_missing_concept_refs(clauses)
+        fix.add_missing_arg0_refs(clauses)
+        fix.add_missing_arg1_refs(clauses)
+        if args.mode == 2:
+            import fix2
+            fix2.ensure_nonempty(clauses)
+            fix2.ensure_main_box(clauses)
+        elif args.mode == 3:
+            import fix3
+            clauses = fix3.ensure_no_loops(clauses)
+            clauses = fix3.ensure_connected(clauses)
+            fix3.ensure_nonempty(clauses)
+        fix.dedup(clauses)
+        if args.mode == 2:
+            fix2.check(clauses, i)
+        elif args.mode == 3:
+            fix3.check(clauses, i)
+        # Output
         print('%%%', ' '.join(sentence))
-        clf.write(((drs,),), sys.stdout)
+        clf.write(((clauses,),), sys.stdout)
