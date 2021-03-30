@@ -8,10 +8,11 @@ import horizontal
 import hyper
 import json
 import random
-import vocab
+import srl
 import sys
 import util
 import vertical
+import vocab
 
 
 random.seed(1337)
@@ -26,6 +27,7 @@ if __name__ == '__main__':
     ap.add_argument('model', help='the trained model')
     ap.add_argument('tok', help='tokenized input sentences in horizontal format')
     ap.add_argument('lemmas', nargs='?', help='input lemmas in vertical format')
+    ap.add_argument('--roles', help='input roles in JSON format')
     args = ap.parse_args()
     # Read training examples
     sentences = []
@@ -58,6 +60,10 @@ if __name__ == '__main__':
         assert len(sentences) == len(lemmass)
     else:
         lemmass = None
+    # Read roles
+    if args.roles:
+        with open(args.roles) as f:
+            roler = srl.Roler(json.reads(l) for l in f)
     # Parse:
     for i, sentence in enumerate(sentences):
         if lemmass:
@@ -66,7 +72,10 @@ if __name__ == '__main__':
         else:
             lemmas = None
         dy.renew_cg()
-        actions, drs = p.parse(sentence, lemmas=lemmas)
+        actions, fragments = p.parse(sentence, lemmas=lemmas)
+        if args.roles:
+            roler.overwrite_roles(fragments, sentence)
+        drs = [c for f in framgents for c in f]
         drs = list(clf.fragment_key(drs))
         drs = finish.realign_pronouns(drs)
         finish.add_missing_refs_from_discourse_relations(drs)
