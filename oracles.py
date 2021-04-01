@@ -63,8 +63,6 @@ if __name__ == '__main__':
     # Aggregate and log inventories
     print('strings:', strings, file=sys.stderr)
     print('# actions:', len(actions), file=sys.stderr)
-    for action in sorted(actions):
-        print(action, file=sys.stderr)
     print('∅ oracle length:', sum(len(r['oracle']) for r in results) / len(results), file=sys.stderr)
     print('∅ number of swap actions:', sum(1 for r in results for a in r['oracle'] if a == ('swap',)) / len(results), file=sys.stderr)
     # Output

@@ -243,7 +243,7 @@ class Parser:
         # Initialize fragments:
         fragments = []
         # Parse:
-        while len(stack) > 1 or len(buf) > 1:
+        while len(stack) > 0 or len(buf) > 0:
             # compute parser state
             p_t = dy.rectify(dy.affine_transform([self.pbias,
                                                   self.S,

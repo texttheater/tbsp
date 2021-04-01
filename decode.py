@@ -3,6 +3,8 @@
 
 import argparse
 import clf
+import constants
+import drs
 import fix
 import horizontal
 import hyper
@@ -28,7 +30,7 @@ if __name__ == '__main__':
     ap.add_argument('tok', help='tokenized input sentences in horizontal format')
     ap.add_argument('lemmas', nargs='?', help='input lemmas in vertical format')
     ap.add_argument('--roles', help='input roles in JSON format')
-    ap.add_argument('--mode', required=True, choices=(2, 3), help='PMB major version')
+    ap.add_argument('--mode', required=True, type=int, choices=(2, 3), help='PMB major version')
     args = ap.parse_args()
     # Read training examples
     sentences = []
