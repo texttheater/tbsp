@@ -5,12 +5,13 @@ import util
 
 class Roler:
 
-    def __init__(self, records, checker):
-        self.checker = checker
+    def __init__(self, records, checker, gold=False):
         self.records = []
         for record in records:
             assert len(record['sentences']) == 1
             self.records.append(record)
+        self.checker = checker
+        self.gold = gold
 
     def lookup(self, doc):
         doc = list(doc)
@@ -24,7 +25,12 @@ class Roler:
                 roles = []
                 offset = 0
                 for k in range(i, j + 1):
-                    for pred, arg_from, arg_to, role in self.records[k]['predicted_srl']:
+                    if self.gold:
+                        assert len(self.records[k]['srl']) == 1
+                        tups = self.records[k]['srl'][0]
+                    else:
+                        tups = self.records[k]['predicted_srl']
+                    for pred, arg_from, arg_to, role in tups:
                         roles.append((
                             pred + offset,
                             arg_from + offset,
@@ -63,5 +69,6 @@ class Roler:
                     if self.checker.is_event_role(clause[1]) \
                             and clause[2] in pred_refs \
                             and clause[3] in arg_refs:
+                        print(f'INFO: replacing {clause[1]} with {role}', file=sys.stderr)
                         clause[1] = role
         return tuple(tuple(tuple(c) for c in f) for f in fragments)

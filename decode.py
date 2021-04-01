@@ -30,8 +30,12 @@ if __name__ == '__main__':
     ap.add_argument('tok', help='tokenized input sentences in horizontal format')
     ap.add_argument('lemmas', nargs='?', help='input lemmas in vertical format')
     ap.add_argument('--roles', help='input roles in JSON format')
+    ap.add_argument('--gold-roles', action='store_true',
+            help='use gold instead of predicted roles')
     ap.add_argument('--mode', required=True, type=int, choices=(2, 3), help='PMB major version')
     args = ap.parse_args()
+    if args.gold_roles and not args.roles:
+        ap.error('--gold-roles requires --roles')
     # Read training examples
     sentences = []
     oracles = []
@@ -66,7 +70,11 @@ if __name__ == '__main__':
     # Read roles
     if args.roles:
         with open(args.roles) as f:
-            roler = srl.Roler(json.reads(l) for l in f)
+            roler = srl.Roler(
+                (json.loads(l) for l in f),
+                drs.Checker(args.mode),
+                args.gold_roles,
+            )
     # Create checker
     checker = drs.Checker(args.mode)
     # Parse:
@@ -78,10 +86,12 @@ if __name__ == '__main__':
             lemmas = None
         dy.renew_cg()
         actions, fragments = p.parse(sentence, lemmas=lemmas)
-        if args.roles:
-            roler.overwrite_roles(fragments, sentence)
-        # Postprocess
+        # Replace Var objects with DRs
         fragments = clf.fragments_key(fragments)
+        # SRL
+        if args.roles:
+            fragments = roler.overwrite_roles(fragments, sentence)
+        # Postprocess
         fragments = constants.replace_constants_rev(fragments)
         fragments = constants.remove_constant_clauses(fragments)
         # Fix
