@@ -9,7 +9,6 @@ Setup
 Make sure Git LFS is installed, then clone the repository and cd into the
 working copy:
 
-    git lfs init
     git clone git@github.com:texttheater/tbsp.git
     cd tbsp
 
@@ -22,8 +21,8 @@ Download data from the [Parallel Meaning Bank](https://pmb.let.rug.nl):
     rm exp_data_2.2.0.zip
     mv exp_data_2.2.0 pmb-2.2.0
     wget https://pmb.let.rug.nl/releases/exp_data_3.0.0.zip
-    unzip exp_data_3.3.0.zip
-    rm exp_data_3.3.0.zip
+    unzip exp_data_3.0.0.zip
+    rm exp_data_3.0.0.zip
     mv pmb_exp_data_3.0.0 pmb-3.0.0
     cd ..
 
