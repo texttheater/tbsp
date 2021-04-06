@@ -77,7 +77,10 @@ class Roler:
             arg_refs = set(
                 c[2]
                 for c in arg_frag
-                if c[1] == 'REF'
+                if (
+                    c[1] == 'REF'
+                    or drs.is_constant(c[1])
+                )
             )
             for frag in fragments:
                 for clause in frag:
