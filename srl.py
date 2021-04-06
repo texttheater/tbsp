@@ -61,18 +61,46 @@ class Roler:
             print(f'WARNING: document {doc} not found', file=sys.stderr)
             return fragments
         fragments = tuple(tuple(list(c) for c in f) for f in fragments)
+        # map boxes to propositions they introduce
+        box_prop_map = {
+            c[0]: c[3]
+            for f in fragments
+            for c in f
+            if len(c) == 4
+            and c[3].startswith('p')
+        }
+        # map boxes to the first event they introduce
+        box_event_map = {}
+        for f in fragments:
+            for c in f:
+                if len(c) == 3 and c[1] == 'REF' and c[2].startswith('e') and c[0] not in box_event_map:
+                    box_event_map[c[0]] = c[2]
+        # enrich box_event_map with modal relations
+        for f in fragments:
+            for c in f:
+                if len(c) == 3 and c[1] in ('NECESSITY', 'POSSIBILITY') and c[2] in box_event_map:
+                    box_event_map[c[0]] = box_event_map[c[2]]
+        # map events to propositions
+        event_prop_map = {}
+        for f in fragments:
+            for c in f:
+                if len(c) == 3 and c[1] == 'ATTRIBUTION' and c[0] in box_prop_map and c[2] in box_event_map:
+                    event_prop_map[box_event_map[c[2]]] = box_prop_map[c[0]]
+        # overwrite roles
         for pred, arg_from, arg_to, role in roles:
             if role == 'V':
                 continue
             if role in DO_NOT_SUBSTITUTE:
                 continue
             assert arg_from == arg_to
+            # collect referents corresponding to the predicate
             pred_frag = fragments[pred]
             pred_refs = set(
                 c[2]
                 for c in pred_frag
                 if c[1] == 'REF'
             )
+            # collect referents corresponding to the filler
             arg_frag = fragments[arg_from]
             arg_refs = set(
                 c[2]
@@ -87,6 +115,11 @@ class Roler:
                 if len(c) == 4
                 and drs.is_sense(c[2])
             )
+            # enrich with propositions corresponding to fillers that are events
+            for arg_ref in tuple(arg_refs):
+                if arg_ref in event_prop_map:
+                    arg_refs.add(event_prop_map[arg_ref])
+            # overwrite
             for frag in fragments:
                 role_clauses = []
                 for clause in frag:
