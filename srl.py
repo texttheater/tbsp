@@ -81,6 +81,11 @@ class Roler:
                     c[1] == 'REF'
                     or drs.is_constant(c[1])
                 )
+            ) | set(
+                c[3]
+                for c in arg_frag
+                if len(c) == 4
+                and drs.is_sense(c[2])
             )
             for frag in fragments:
                 for clause in frag:
