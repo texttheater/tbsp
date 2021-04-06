@@ -3,6 +3,24 @@ import sys
 import util
 
 
+# exclude some substitutions based on
+# 210325_srl_confusion_matrix.xslx
+DO_NOT_REPLACE = set(
+    'Attribute',
+    'Causer',
+    'Produce',
+)
+DO_NOT_SUBSTITUTE = set(
+    'PartOf',
+    'Patient',
+    'Product',
+    'Result',
+    'Source',
+    'Theme',
+    'Topic',
+)
+
+
 class Roler:
 
     def __init__(self, records, checker, gold=False):
@@ -51,6 +69,8 @@ class Roler:
         for pred, arg_from, arg_to, role in roles:
             if role == 'V':
                 continue
+            if role in DO_NOT_SUBSTITUTE:
+                continue
             assert arg_from == arg_to
             pred_frag = fragments[pred]
             pred_refs = set(
@@ -67,6 +87,7 @@ class Roler:
             for frag in fragments:
                 for clause in frag:
                     if self.checker.is_event_role(clause[1]) \
+                            and clause[1] not in DO_NOT_REPLACE \
                             and clause[2] in pred_refs \
                             and clause[3] in arg_refs:
                         print(f'INFO: replacing {clause[1]} with {role}', file=sys.stderr)
