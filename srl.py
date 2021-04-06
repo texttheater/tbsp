@@ -88,10 +88,15 @@ class Roler:
                 and drs.is_sense(c[2])
             )
             for frag in fragments:
+                role_clauses = []
                 for clause in frag:
                     if self.checker.is_event_role(clause[1]) \
                             and clause[2] in pred_refs \
                             and clause[3] in arg_refs:
-                        print(f'INFO: replacing {clause[1]} with {role}', file=sys.stderr)
-                        clause[1] = role
+                        role_clauses.append(clause)
+                if len(role_clauses) > 1:
+                    role_clauses = [r for r in role_clauses if r[1] != 'Time']
+                if len(role_clauses) > 0 and role_clauses[0][1] != role:
+                    print(f'INFO: replacing {role_clauses[0][1]} with {role}', file=sys.stderr)
+                    role_clauses[0][1] = role
         return tuple(tuple(tuple(c) for c in f) for f in fragments)
