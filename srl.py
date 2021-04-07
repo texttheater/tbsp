@@ -6,12 +6,12 @@ import util
 # exclude some substitutions based on
 # 210325_srl_confusion_matrix.xslx
 DO_NOT_SUBSTITUTE = set((
-    'PartOf',
-    'Patient',
+    'Attribute',
+    'Beneficiary',
+    'Causer',
+    'Co-Patient',
     'Product',
-    'Result',
-    'Source',
-    'Theme',
+    'Recipient',
     'Topic',
 ))
 
