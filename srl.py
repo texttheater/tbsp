@@ -100,7 +100,7 @@ class Roler:
         for pred, arg_from, arg_to, role in roles:
             if role == 'V':
                 continue
-            if role in DO_NOT_SUBSTITUTE:
+            if (not self.gold) and role in DO_NOT_SUBSTITUTE:
                 continue
             assert arg_from == arg_to
             # collect referents corresponding to the predicate
