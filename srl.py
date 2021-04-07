@@ -21,7 +21,6 @@ class Roler:
     def __init__(self, records, checker, gold=False):
         self.records = []
         for record in records:
-            assert len(record['sentences']) == 1
             self.records.append(record)
         self.checker = checker
         self.gold = gold
@@ -33,31 +32,42 @@ class Roler:
             potential_doc = list(self.records[j]['sentences'][0])
             while j + 1 < len(self.records) and len(potential_doc) < len(doc) and potential_doc == doc[:len(potential_doc)]:
                 j += 1
-                potential_doc.extend(self.records[j]['sentences'][0])
+                for sentence in self.records[j]['sentences']:
+                    potential_doc.extend(sentence)
             if potential_doc == doc:
                 roles = []
                 offset = 0
                 for k in range(i, j + 1):
+                    sentences = self.records[k]['sentences']
                     if self.gold:
-                        assert len(self.records[k]['srl']) == 1
-                        tups = self.records[k]['srl'][0]
+                        tupss = self.records[k]['srl']
                     else:
-                        tups = self.records[k]['predicted_srl']
-                    for pred, arg_from, arg_to, role in tups:
-                        roles.append((
-                            pred + offset,
-                            arg_from + offset,
-                            arg_to + offset,
-                            role
-                        ))
-                    offset += len(self.records[k]['sentences'][0])
+                        tupss = self.records[k]['predicted_srl']
+                        # Work around inconsistent formats:
+                        if tupss == []:
+                            tupss = [[]]
+                        elif len(tupss[0]) > 0 and type(tupss[0][0]) != list:
+                            pred, arg_from, arg_to, role = tupss[0]
+                            assert type(arg_from) == int
+                            assert type(arg_to) == int
+                            tupss = [tupss]
+                    assert len(tupss) == len(sentences)
+                    for tups, sentence in zip(tupss, sentences):
+                        for pred, arg_from, arg_to, role in tups:
+                            roles.append((
+                                pred + offset,
+                                arg_from + offset,
+                                arg_to + offset,
+                                role
+                            ))
+                        offset += len(sentence)
                 return roles
-        raise IndexError(f'document {doc} not found')
+        raise KeyError(f'document {doc} not found')
 
     def overwrite_roles(self, fragments, doc):
         try:
             roles = self.lookup(doc)
-        except IndexError:
+        except KeyError:
             print(f'WARNING: document {doc} not found', file=sys.stderr)
             return fragments
         fragments = tuple(tuple(list(c) for c in f) for f in fragments)
