@@ -32,6 +32,7 @@ if __name__ == '__main__':
     ap.add_argument('--roles', help='input roles in JSON format')
     ap.add_argument('--gold-roles', action='store_true',
             help='use gold instead of predicted roles')
+    ap.add_argument('--exp-key', help='experiment key (for excluding specific roles)')
     ap.add_argument('--mode', required=True, type=int, choices=(2, 3), help='PMB major version')
     args = ap.parse_args()
     if args.gold_roles and not args.roles:
@@ -73,7 +74,8 @@ if __name__ == '__main__':
             roler = srl.Roler(
                 (json.loads(l) for l in f),
                 drs.Checker(args.mode),
-                args.gold_roles,
+                gold=args.gold_roles,
+                exp_key=args.exp_key,
             )
     # Create checker
     checker = drs.Checker(args.mode)

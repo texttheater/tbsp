@@ -1,29 +1,23 @@
+import collections
 import drs
 import sys
 import util
 
 
-# exclude some substitutions based on
-# 210325_srl_confusion_matrix.xslx
-DO_NOT_SUBSTITUTE = set((
-    'Attribute',
-    'Beneficiary',
-    'Causer',
-    'Co-Patient',
-    'Product',
-    'Recipient',
-    'Topic',
-))
-
-
 class Roler:
 
-    def __init__(self, records, checker, gold=False):
+    def __init__(self, records, checker, gold=False, exp_key=None):
         self.records = []
         for record in records:
             self.records.append(record)
         self.checker = checker
         self.gold = gold
+        self.never_replace_roles = {'Name', 'Time'}
+        self.never_insert_roles = set()
+        if exp_key:
+            sys.path.append('SRL-DRS/src')
+            import drs_config
+            self.never_insert_roles.update(drs_config.never_insert_roles[exp_key])
 
     def lookup(self, doc):
         doc = list(doc)
@@ -71,6 +65,12 @@ class Roler:
             print(f'WARNING: document {doc} not found', file=sys.stderr)
             return fragments
         fragments = tuple(tuple(list(c) for c in f) for f in fragments)
+        # map boxes to the set of roles present in them
+        box_roles_map = collections.defaultdict(set)
+        for f in fragments:
+            for c in f:
+                if self.checker.is_event_role(c[1]):
+                    box_roles_map[c[0]].add(c[1])
         # map boxes to propositions they introduce
         box_prop_map = {
             c[0]: c[3]
@@ -100,26 +100,20 @@ class Roler:
         for pred, arg_from, arg_to, role in roles:
             if role == 'V':
                 continue
-            if (not self.gold) and role in DO_NOT_SUBSTITUTE:
+            if role in self.never_insert_roles:
                 continue
             assert arg_from == arg_to
             # collect referents corresponding to the predicate
             pred_frag = fragments[pred]
             pred_refs = set(
-                c[2]
+                c[3]
                 for c in pred_frag
-                if c[1] == 'REF'
+                if len(c) == 4
+                and drs.is_sense(c[2])
             )
             # collect referents corresponding to the filler
             arg_frag = fragments[arg_from]
             arg_refs = set(
-                c[2]
-                for c in arg_frag
-                if (
-                    c[1] == 'REF'
-                    or drs.is_constant(c[1])
-                )
-            ) | set(
                 c[3]
                 for c in arg_frag
                 if len(c) == 4
@@ -135,11 +129,9 @@ class Roler:
                 for clause in frag:
                     if self.checker.is_event_role(clause[1]) \
                             and clause[2] in pred_refs \
-                            and clause[3] in arg_refs:
-                        role_clauses.append(clause)
-                if len(role_clauses) > 1:
-                    role_clauses = [r for r in role_clauses if r[1] != 'Time']
-                if len(role_clauses) > 0 and role_clauses[0][1] != role:
-                    print(f'INFO: replacing {role_clauses[0][1]} with {role}', file=sys.stderr)
-                    role_clauses[0][1] = role
+                            and clause[3] in arg_refs \
+                            and clause[1] not in self.never_replace_roles \
+                            and role not in box_roles_map[clause[0]]:
+                        print(f'INFO: replacing {clause[1]} with {role}', file=sys.stderr)
+                        clause[1] = role
         return tuple(tuple(tuple(c) for c in f) for f in fragments)
