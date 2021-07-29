@@ -38,6 +38,7 @@ Clone/download required external software packages:
     git clone https://github.com/RikVN/DRS_parsing.git ext/DRS_parsing_3
     git clone https://github.com/HIT-SCIR/ELMoForManyLangs.git ext/ElMoForManyLangs
     git clone https://github.com/ParallelMeaningBank/elephant.git ext/elephant
+    git clone https://github.com/RikVN/SRL-DRS.git ext/SRL-DRS
     wget https://github.com/ufal/udpipe/releases/download/v1.2.0/udpipe-1.2.0-bin.zip
     unzip -d ext udpipe-1.2.0-bin.zip
     rm udpipe-1.2.0-bin.zip

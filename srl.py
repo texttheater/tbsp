@@ -15,7 +15,7 @@ class Roler:
         self.never_replace_roles = {'Name', 'Time'}
         self.never_insert_roles = set()
         if exp_key:
-            sys.path.append('SRL-DRS/src')
+            sys.path.append('ext/SRL-DRS/src')
             import drs_config
             self.never_insert_roles.update(drs_config.never_insert_roles[exp_key])
 
