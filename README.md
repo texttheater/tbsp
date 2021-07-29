@@ -64,11 +64,27 @@ Download [UDPipe models](http://ufal.mff.cuni.cz/udpipe/models) for lemmatizatio
 Experiments
 -----------
 
-Run experiments on the PMB 2.2.0 development data:
+The results from Bladier et al. (2021) can be reproduced as follows.
 
-    produce out/pmb-2.2.0.en.dev.gold.sg{0..20}g{1..20}.eval
-    produce out/pmb-2.2.0.{de,it,nl}.dev.gold,s{0..20}.eval
+First, run experiments on the PMB 3.0.0 development data:
+
+    produce out/pmb-3.0.0.en.dev.gold.sg{0..5}g{1..20}.eval
+    produce out/pmb-3.0.0.{de,it,nl}.dev.gold,s{0..20}.eval
 
 Test the best-on-dev models on the test data:
 
-TBC
+    produce out/pmb-3.0.0.en.test.tok
+    python3 decode.py en out/pmb-3.0.0.en.train.gold.oracles.jsonl out/pmb-3.0.0.en.train.sg4g16.model out/pmb-3.0.0.en.test.tok --mode 3 > test.clf
+    python3 decode.py en out/pmb-3.0.0.en.train.gold.oracles.jsonl out/pmb-3.0.0.en.train.sg4g16.model out/pmb-3.0.0.en.test.tok --mode 3 test.clf -f2 data/pmb-3.0.0/en/gold/test.txt -prin -ill dummy -g ext/DRS_parsing_3/evaluation/clf_signature.yaml > test.eval
+
+Now try with external SRL prediction, e.g., with CCG-based conversion and an
+ELMo SRL model:
+
+    python3 decode.py en out/pmb-3.0.0.en.train.gold.oracles.jsonl out/pmb-3.0.0.en.train.sg4g16.model out/pmb-3.0.0.en.test.tok --mode 3 --roles data/srl/drs_elmo.test.json --exp-key drs_elmo > test_drs_elmo.clf
+    python3 decode.py en out/pmb-3.0.0.en.train.gold.oracles.jsonl out/pmb-3.0.0.en.train.sg4g16.model out/pmb-3.0.0.en.test.tok --mode 3 test_drs_elmo.clf -f2 data/pmb-3.0.0/en/gold/test.txt -prin -ill dummy -g ext/DRS_parsing_3/evaluation/clf_signature.yaml > test_drs_elmo.eval
+
+References
+----------
+
+Tatiana Bladier, Gosse Minnema, Rik van Noord, Kilian Evang (2021): Improving
+DRS Parsing with Separately Predicted Semantic Roles. Proceedings of CSTFRS.
